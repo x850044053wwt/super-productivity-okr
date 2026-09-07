@@ -43,4 +43,4 @@ O、KR 及顺序使用现有插件持久化接口保存为一份文档，支持�
 
 宿主必须支持 `persistedDataChanged` hook；主项目中修复的保存完成时机逻辑仍由主项目维护。仅安装 ZIP 不会修复旧宿主的保存逻辑。
 
-当前仓库只在本机初始化，尚未配置远程仓库或推送。
+私有远程仓库：[x850044053wwt/super-productivity-okr](https://github.com/x850044053wwt/super-productivity-okr)。克隆和更新需要拥有仓库访问权限。
