@@ -1,0 +1,18 @@
+{
+  "TITLE": "OKR",
+  "OBJECTIVE": "Objective (O)",
+  "KEY_RESULT": "Key result (KR)",
+  "ADD_OBJECTIVE": "Add objective",
+  "ADD_KEY_RESULT": "Add key result",
+  "EMPTY": "Add an objective, then define its key results.",
+  "NO_KEY_RESULTS": "No key results yet.",
+  "DELETE": "Delete",
+  "DELETE_OBJECTIVE": "Delete this objective and all its key results?",
+  "CANCEL": "Cancel",
+  "MOVE_UP": "Move up",
+  "MOVE_DOWN": "Move down",
+  "DRAG": "Drag to reorder",
+  "REFRESH": "Refresh",
+  "ERROR": "Could not load or save OKRs. Your input is kept. Try again.",
+  "LOADING": "Loading…"
+}

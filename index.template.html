@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+    <title>OKR</title>
+    <style>
+      /* The host injects the shared plugin UI kit and theme tokens. */
+      body {
+        padding: var(--s3);
+      }
+      main {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      header,
+      .row,
+      form,
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: var(--s);
+      }
+      header {
+        justify-content: space-between;
+      }
+      form {
+        margin-block: var(--s2);
+        flex-wrap: wrap;
+      }
+      input {
+        flex: 1;
+        min-width: 120px;
+      }
+      article {
+        background: var(--card-bg);
+        padding: var(--s2);
+        margin-block: var(--s2);
+      }
+      .title {
+        flex: 1;
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+      h2 {
+        font-size: var(--font-size-lg);
+        margin: 0;
+      }
+      .kr-list {
+        padding-inline-start: var(--s3);
+      }
+      .kr {
+        padding-block: var(--s);
+      }
+      .actions {
+        flex-shrink: 0;
+      }
+      .muted {
+        color: var(--text-color-muted);
+      }
+      #error {
+        color: var(--color-danger);
+      }
+      [draggable='true'] {
+        cursor: grab;
+      }
+      dialog {
+        background: var(--card-bg);
+        color: var(--text-color);
+        padding: var(--s3);
+        border: 0;
+        max-width: 90%;
+      }
+      @media (max-width: 440px) {
+        body {
+          padding: var(--s);
+        }
+        .row {
+          flex-wrap: wrap;
+        }
+        .actions {
+          margin-inline-start: auto;
+        }
+        .kr-list {
+          padding-inline-start: var(--s);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1 data-t="TITLE"></h1>
+        <button
+          id="refresh"
+          data-t="REFRESH"
+        ></button>
+      </header>
+      <p
+        id="error"
+        role="alert"
+        hidden
+      ></p>
+      <form id="add-objective">
+        <input
+          id="objective-title"
+          maxlength="500"
+          required
+        /><button
+          type="submit"
+          data-t="ADD_OBJECTIVE"
+        ></button>
+      </form>
+      <section
+        id="objectives"
+        aria-live="polite"
+      ></section>
+      <dialog id="confirm">
+        <p data-t="DELETE_OBJECTIVE"></p>
+        <form method="dialog">
+          <button
+            value="cancel"
+            data-t="CANCEL"
+            autofocus
+          ></button
+          ><button
+            value="delete"
+            data-t="DELETE"
+          ></button>
+        </form>
+      </dialog>
+    </main>
+    <script>
+      /* MODEL */
+    </script>
+    <script>
+      /* APP */
+    </script>
+  </body>
+</html>

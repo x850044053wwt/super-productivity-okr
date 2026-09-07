@@ -1,0 +1,13 @@
+{
+  "id": "okr",
+  "name": "OKR",
+  "version": "1.0.0",
+  "manifestVersion": 1,
+  "minSupVersion": "18.21.2",
+  "description": "A simple list of objectives and their key results, with ordering and sync.",
+  "iFrame": true,
+  "icon": "icon.svg",
+  "permissions": ["persistDataSynced", "loadSyncedData"],
+  "hooks": ["persistedDataChanged"],
+  "i18n": { "languages": ["en"] }
+}

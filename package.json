@@ -1,0 +1,14 @@
+{
+  "name": "okr",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node build.cjs",
+    "test": "node --test model.test.cjs",
+    "package": "npm run build && node package.cjs"
+  },
+  "description": "Standalone OKR plugin for Super Productivity",
+  "engines": {
+    "node": ">=18"
+  }
+}
