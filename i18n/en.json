@@ -14,5 +14,13 @@
   "DRAG": "Drag to reorder",
   "REFRESH": "Refresh",
   "ERROR": "Could not load or save OKRs. Your input is kept. Try again.",
-  "LOADING": "Loading…"
+  "LOADING": "Loading…",
+  "PERIOD": "Two-month period",
+  "PREVIOUS_PERIOD": "Previous period",
+  "NEXT_PERIOD": "Next period",
+  "CURRENT_PERIOD": "Today",
+  "CARRY_TO_NEXT_PERIOD": "Carry over to next period",
+  "CARRY_TO_PREVIOUS_PERIOD": "Move back to previous period",
+  "UNASSIGNED": "Objectives created before periods existed:",
+  "ASSIGN_TO_PERIOD": "Assign them to this period"
 }

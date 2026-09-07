@@ -1,10 +1,10 @@
 {
   "id": "okr",
   "name": "OKR",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "manifestVersion": 1,
   "minSupVersion": "18.21.2",
-  "description": "A simple list of objectives and their key results, with ordering and sync.",
+  "description": "Objectives and key results maintained per two-month period, with ordering, carry-over and sync.",
   "iFrame": true,
   "icon": "icon.svg",
   "permissions": ["persistDataSynced", "loadSyncedData"],

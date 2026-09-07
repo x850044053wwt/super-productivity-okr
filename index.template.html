@@ -27,6 +27,28 @@
       header {
         justify-content: space-between;
       }
+      nav {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--s);
+        margin-block: var(--s2);
+      }
+      nav output {
+        font-size: var(--font-size-lg);
+        font-weight: 600;
+        min-width: 10ch;
+        text-align: center;
+      }
+      #unassigned {
+        background: var(--card-bg);
+        padding: var(--s2);
+        margin-block: var(--s2);
+      }
+      #unassigned ul {
+        margin-block: var(--s);
+        padding-inline-start: var(--s3);
+      }
       form {
         margin-block: var(--s2);
         flex-wrap: wrap;
@@ -104,6 +126,42 @@
         role="alert"
         hidden
       ></p>
+      <nav id="period">
+        <button
+          id="previous-period"
+          type="button"
+        >
+          ◀
+        </button>
+        <output id="period-label"></output>
+        <button
+          id="next-period"
+          type="button"
+        >
+          ▶
+        </button>
+        <button
+          id="current-period"
+          type="button"
+          data-t="CURRENT_PERIOD"
+          hidden
+        ></button>
+      </nav>
+      <section
+        id="unassigned"
+        hidden
+      >
+        <p
+          class="muted"
+          data-t="UNASSIGNED"
+        ></p>
+        <ul></ul>
+        <button
+          id="assign-unassigned"
+          type="button"
+          data-t="ASSIGN_TO_PERIOD"
+        ></button>
+      </section>
       <form id="add-objective">
         <input
           id="objective-title"

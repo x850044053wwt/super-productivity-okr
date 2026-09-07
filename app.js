@@ -11,8 +11,30 @@
   const error = document.getElementById('error');
   const objectiveInput = document.getElementById('objective-title');
   const confirm = document.getElementById('confirm');
+  const periodLabel = document.getElementById('period-label');
+  const currentPeriodButton = document.getElementById('current-period');
+  const unassigned = document.getElementById('unassigned');
   objectiveInput.placeholder = T.OBJECTIVE;
   objectiveInput.setAttribute('aria-label', T.OBJECTIVE);
+  const monthRange = new Intl.DateTimeFormat(document.documentElement.lang, {
+    year: 'numeric',
+    month: 'short',
+  });
+  const labelFor = (periodId) => {
+    const [start, end] = OkrModel.periodMonths(periodId);
+    return monthRange.formatRange ? monthRange.formatRange(start, end) : periodId;
+  };
+  for (const [id, key] of [
+    ['previous-period', 'PREVIOUS_PERIOD'],
+    ['next-period', 'NEXT_PERIOD'],
+  ]) {
+    const b = document.getElementById(id);
+    b.title = T[key];
+    b.setAttribute('aria-label', T[key]);
+  }
+  document.getElementById('period').setAttribute('aria-label', T.PERIOD);
+  // The period shown is a view choice, so it is intentionally not part of the synced document.
+  let periodId = OkrModel.periodForDate(new Date());
   let doc = OkrModel.empty();
   let busy = false;
   let loaded = false;
@@ -27,7 +49,9 @@
   function setBusy(value) {
     busy = value;
     document
-      .querySelectorAll('main > form button, #refresh, #objectives button')
+      .querySelectorAll(
+        'main > form button, #refresh, nav button, #unassigned button, #objectives button',
+      )
       .forEach((b) => {
         b.disabled = value || b.dataset.boundary === 'true';
       });
@@ -91,7 +115,20 @@
     const item = items[index];
     const type = objectiveId ? 'KeyResult' : 'Objective';
     const move = (beforeId) =>
-      commit({ type: `move${type}`, id: item.id, objectiveId, beforeId });
+      commit({
+        type: `move${type}`,
+        id: item.id,
+        objectiveId,
+        beforeId,
+        periodId,
+      });
+    const carry = (delta) =>
+      commit({
+        type: 'setObjectivePeriod',
+        id: item.id,
+        periodId,
+        toPeriodId: OkrModel.shiftPeriod(periodId, delta),
+      });
     const actions = element('div', 'actions');
     const handle = element('span', 'muted', '⠿');
     handle.draggable = true;
@@ -124,11 +161,22 @@
         return;
       const source = items.findIndex((x) => x.id === dragged.id);
       const beforeId = source < index ? (items[index + 1]?.id ?? null) : item.id;
-      void commit({ type: `move${type}`, id: dragged.id, objectiveId, beforeId });
+      void commit({
+        type: `move${type}`,
+        id: dragged.id,
+        objectiveId,
+        beforeId,
+        periodId,
+      });
       dragged = null;
     };
+    actions.append(handle);
+    if (!objectiveId)
+      actions.append(
+        button(T.CARRY_TO_PREVIOUS_PERIOD, '←', () => carry(-1)),
+        button(T.CARRY_TO_NEXT_PERIOD, '→', () => carry(1)),
+      );
     actions.append(
-      handle,
       button(T.MOVE_UP, '↑', () => move(items[index - 1].id), index === 0),
       button(
         T.MOVE_DOWN,
@@ -145,7 +193,7 @@
           });
           if (result !== 'delete') return;
         }
-        await commit({ type: `delete${type}`, id: item.id, objectiveId }, () =>
+        await commit({ type: `delete${type}`, id: item.id, objectiveId, periodId }, () =>
           drafts.delete(item.id),
         );
       }),
@@ -153,13 +201,21 @@
     row.append(actions);
   }
   function render() {
+    periodLabel.textContent = labelFor(periodId);
+    currentPeriodButton.hidden = periodId === OkrModel.periodForDate(new Date());
+    const legacy = OkrModel.unassignedObjectives(doc);
+    unassigned.hidden = !legacy.length;
+    unassigned
+      .querySelector('ul')
+      .replaceChildren(...legacy.map((o) => element('li', 'muted', o.title)));
+    const objectives = OkrModel.objectivesForPeriod(doc, periodId);
     list.replaceChildren();
-    if (!doc.objectives.length) list.append(element('p', 'muted', T.EMPTY));
-    doc.objectives.forEach((o, i) => {
+    if (!objectives.length) list.append(element('p', 'muted', T.EMPTY));
+    objectives.forEach((o, i) => {
       const article = element('article', '');
       const row = element('div', 'row');
       row.append(element('h2', 'title', `O${i + 1} · ${o.title}`));
-      controls(row, doc.objectives, i);
+      controls(row, objectives, i);
       const results = element('div', 'kr-list');
       o.keyResults.forEach((kr, j) => {
         const krRow = element('div', 'row kr');
@@ -188,6 +244,7 @@
             objectiveId: o.id,
             id: crypto.randomUUID(),
             title: input.value,
+            periodId,
           },
           () => drafts.delete(o.id),
         );
@@ -200,12 +257,29 @@
     event.preventDefault();
     if (!objectiveInput.value.trim()) return;
     void commit(
-      { type: 'addObjective', id: crypto.randomUUID(), title: objectiveInput.value },
+      {
+        type: 'addObjective',
+        id: crypto.randomUUID(),
+        title: objectiveInput.value,
+        periodId,
+      },
       () => {
         objectiveInput.value = '';
       },
     );
   };
+  function showPeriod(next) {
+    if (busy) return;
+    periodId = next;
+    render();
+  }
+  document.getElementById('previous-period').onclick = () =>
+    showPeriod(OkrModel.shiftPeriod(periodId, -1));
+  document.getElementById('next-period').onclick = () =>
+    showPeriod(OkrModel.shiftPeriod(periodId, 1));
+  currentPeriodButton.onclick = () => showPeriod(OkrModel.periodForDate(new Date()));
+  document.getElementById('assign-unassigned').onclick = () =>
+    commit({ type: 'assignUnassigned', periodId });
   document.getElementById('refresh').onclick = refresh;
   window.addEventListener('focus', () => {
     if (document.activeElement?.tagName !== 'INPUT') void refresh();
