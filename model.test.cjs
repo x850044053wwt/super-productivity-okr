@@ -219,3 +219,48 @@ test('an objective can be carried over to another period with its key results an
     d,
   );
 });
+
+test('a past objective can be self-scored 0–100 with one comment, only from its own period', () => {
+  const { isPastPeriod } = require('./model');
+  let d = apply(empty(), {
+    type: 'addObjective',
+    id: 'a',
+    title: 'A',
+    periodId: '2026-07',
+  });
+  const review = (patch) =>
+    apply(d, { type: 'reviewObjective', id: 'a', periodId: '2026-07', ...patch });
+  for (const bad of [
+    { score: 101, comment: '' },
+    { score: -1, comment: '' },
+    { score: 50.5, comment: '' },
+    { score: '50', comment: '' },
+    { score: 50 },
+    { score: 50, comment: '', periodId: '2026-09' },
+  ]) {
+    assert.equal(review(bad), d);
+  }
+  d = review({ score: 70, comment: '  Shipped late but complete.  ' });
+  assert.deepEqual(d.objectives[0].review, {
+    score: 70,
+    comment: 'Shipped late but complete.',
+  });
+  d = review({ score: 0, comment: '' });
+  assert.deepEqual(d.objectives[0].review, { score: 0, comment: '' });
+  assert.deepEqual(parse(JSON.stringify(d)), d);
+  assert.equal(
+    parse(JSON.stringify(d)).objectives[0].keyResults.length,
+    0,
+    'review must not disturb key results',
+  );
+  for (const bad of [{ score: 100 }, { score: 'x', comment: '' }, null, 5]) {
+    const raw = {
+      version: 1,
+      objectives: [{ id: 'a', title: 'A', keyResults: [], review: bad }],
+    };
+    assert.throws(() => parse(JSON.stringify(raw)));
+  }
+  assert.equal(isPastPeriod('2026-07', new Date(2026, 8, 7)), true);
+  assert.equal(isPastPeriod('2026-09', new Date(2026, 8, 7)), false);
+  assert.equal(isPastPeriod('2026-11', new Date(2026, 8, 7)), false);
+});

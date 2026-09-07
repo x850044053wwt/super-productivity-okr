@@ -1,13 +1,15 @@
 {
   "id": "okr",
   "name": "OKR",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "manifestVersion": 1,
   "minSupVersion": "18.21.2",
-  "description": "Objectives and key results maintained per two-month period, with ordering, carry-over and sync.",
+  "description": "Objectives and key results maintained per two-month period, with ordering, carry-over, self-review and sync.",
   "iFrame": true,
   "icon": "icon.svg",
   "permissions": ["persistDataSynced", "loadSyncedData"],
   "hooks": ["persistedDataChanged"],
-  "i18n": { "languages": ["en"] }
+  "i18n": {
+    "languages": ["en"]
+  }
 }

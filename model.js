@@ -20,6 +20,17 @@
     doc.objectives.filter((o) => o.periodId === periodId);
   const unassignedObjectives = (doc) =>
     doc.objectives.filter((o) => o.periodId === undefined);
+  // Self-assessment written after a period ended: 0–100 percent plus one comment.
+  const isScore = (value) => Number.isInteger(value) && value >= 0 && value <= 100;
+  const isReview = (r) =>
+    r === undefined ||
+    (r !== null &&
+      typeof r === 'object' &&
+      isScore(r.score) &&
+      typeof r.comment === 'string' &&
+      r.comment.length <= 500);
+  // Reviews are only meaningful for periods that already ended.
+  const isPastPeriod = (periodId, today) => periodId < periodForDate(today);
   function parse(raw) {
     if (raw === null) return empty();
     const doc = JSON.parse(raw);
@@ -35,6 +46,7 @@
         (o) =>
           validItem(o) &&
           (o.periodId === undefined || isPeriod(o.periodId)) &&
+          isReview(o.review) &&
           Array.isArray(o.keyResults) &&
           unique(o.keyResults) &&
           o.keyResults.every(validItem),
@@ -106,6 +118,24 @@
           ),
         };
       }
+      case 'reviewObjective': {
+        const target = find(action.id);
+        const comment = action.comment?.trim();
+        if (
+          !target ||
+          !inScope(target) ||
+          !isScore(action.score) ||
+          comment === undefined
+        )
+          return doc;
+        const review = { score: action.score, comment: comment.slice(0, 500) };
+        return {
+          ...doc,
+          objectives: doc.objectives.map((o) =>
+            o.id === action.id ? { ...o, review } : o,
+          ),
+        };
+      }
       case 'assignUnassigned':
         if (!scoped || !unassignedObjectives(doc).length) return doc;
         return {
@@ -153,6 +183,7 @@
     periodMonths,
     objectivesForPeriod,
     unassignedObjectives,
+    isPastPeriod,
   };
   if (typeof module !== 'undefined') module.exports = api;
   else root.OkrModel = api;

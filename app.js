@@ -42,6 +42,7 @@
   let revision = 0;
   let dragged = null;
   const drafts = new Map();
+  const reviewDrafts = new Map();
   function showError() {
     error.textContent = T.ERROR;
     error.hidden = false;
@@ -193,16 +194,64 @@
           });
           if (result !== 'delete') return;
         }
-        await commit({ type: `delete${type}`, id: item.id, objectiveId, periodId }, () =>
-          drafts.delete(item.id),
+        await commit(
+          { type: `delete${type}`, id: item.id, objectiveId, periodId },
+          () => {
+            drafts.delete(item.id);
+            reviewDrafts.delete(item.id);
+          },
         );
       }),
     );
     row.append(actions);
   }
+  // Self-review for an objective of a period that already ended: a 0–100 score and one comment.
+  function reviewForm(o) {
+    const draft = reviewDrafts.get(o.id) ?? o.review ?? { score: 0, comment: '' };
+    const form = element('form', 'review');
+    const label = element('label', 'score');
+    const range = element('input', '');
+    range.type = 'range';
+    range.min = 0;
+    range.max = 100;
+    range.step = 1;
+    range.value = draft.score;
+    range.setAttribute('aria-label', `${T.SCORE}: ${o.title}`);
+    const value = element('output', '', `${draft.score}%`);
+    label.append(element('span', 'muted', T.SCORE), range, value);
+    const comment = element('input', '');
+    comment.placeholder = T.REVIEW_COMMENT;
+    comment.setAttribute('aria-label', `${T.REVIEW_COMMENT}: ${o.title}`);
+    comment.maxLength = 200;
+    comment.value = draft.comment;
+    const save = element('button', '', T.SAVE_REVIEW);
+    save.type = 'submit';
+    const changed = () => {
+      value.textContent = `${range.value}%`;
+      reviewDrafts.set(o.id, { score: Number(range.value), comment: comment.value });
+    };
+    range.oninput = changed;
+    comment.oninput = changed;
+    form.onsubmit = (event) => {
+      event.preventDefault();
+      void commit(
+        {
+          type: 'reviewObjective',
+          id: o.id,
+          periodId,
+          score: Number(range.value),
+          comment: comment.value,
+        },
+        () => reviewDrafts.delete(o.id),
+      );
+    };
+    form.append(label, comment, save);
+    return form;
+  }
   function render() {
     periodLabel.textContent = labelFor(periodId);
     currentPeriodButton.hidden = periodId === OkrModel.periodForDate(new Date());
+    const past = OkrModel.isPastPeriod(periodId, new Date());
     const legacy = OkrModel.unassignedObjectives(doc);
     unassigned.hidden = !legacy.length;
     unassigned
@@ -215,6 +264,11 @@
       const article = element('article', '');
       const row = element('div', 'row');
       row.append(element('h2', 'title', `O${i + 1} · ${o.title}`));
+      if (o.review) {
+        const score = element('span', 'badge', `${o.review.score}%`);
+        score.title = o.review.comment;
+        row.append(score);
+      }
       controls(row, objectives, i);
       const results = element('div', 'kr-list');
       o.keyResults.forEach((kr, j) => {
@@ -250,6 +304,9 @@
         );
       };
       article.append(row, results, form);
+      if (o.review?.comment)
+        article.append(element('p', 'muted comment', o.review.comment));
+      if (past) article.append(reviewForm(o));
       list.append(article);
     });
   }

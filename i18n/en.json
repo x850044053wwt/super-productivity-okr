@@ -22,5 +22,8 @@
   "CARRY_TO_NEXT_PERIOD": "Carry over to next period",
   "CARRY_TO_PREVIOUS_PERIOD": "Move back to previous period",
   "UNASSIGNED": "Objectives created before periods existed:",
-  "ASSIGN_TO_PERIOD": "Assign them to this period"
+  "ASSIGN_TO_PERIOD": "Assign them to this period",
+  "SCORE": "Self-score",
+  "REVIEW_COMMENT": "One-line review",
+  "SAVE_REVIEW": "Save review"
 }
