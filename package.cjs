@@ -18,6 +18,7 @@ execFileSync(
     "icon.svg",
     "index.html",
     "i18n/en.json",
+    "LICENSE",
   ],
   {
     cwd: path.join(__dirname, "dist"),

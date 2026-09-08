@@ -27,7 +27,9 @@ npm run package
 | `i18n/en.json`               | 界面文案                |
 | `build.cjs`、`package.cjs`   | 构建和 ZIP 打包         |
 
-## 主应用集成
+## 自维护宿主集成
+
+本节描述自维护的 Super Productivity 宿主集成方式，不代表已被官方内置或收录。
 
 主应用通过 Git 子模块 `packages/plugin-dev/okr` 固定此仓库的一个提交。主应用构建脚本负责把 `dist/` 复制到 `src/assets/bundled-plugins/okr/`，不要直接编辑生成文件。
 
@@ -58,4 +60,19 @@ O、KR 及顺序使用现有插件持久化接口保存为一份文档，支持�
 
 宿主必须支持 `persistedDataChanged` hook；主项目中修复的保存完成时机逻辑仍由主项目维护。仅安装 ZIP 不会修复旧宿主的保存逻辑。
 
-私有远程仓库：[x850044053wwt/super-productivity-okr](https://github.com/x850044053wwt/super-productivity-okr)。克隆和更新需要拥有仓库访问权限。
+## 社区插件收录与发布
+
+源码仓库：[x850044053wwt/super-productivity-okr](https://github.com/x850044053wwt/super-productivity-okr)。公开发布前需要将 GitHub 仓库设为 Public；添加许可证不会自动改变仓库可见性。
+
+1. 在官方原版 Super Productivity 中验证 ZIP 安装、保存、重启恢复和跨设备同步，确认最低兼容版本。上文涉及的宿主修复若尚未进入官方版本，需要先解决兼容性并更新 `minSupVersion`。
+2. 执行 `npm test` 和 `npm run package`，创建版本 Release 并上传 `releases/okr-<version>.zip`。安装方式为 Settings → Plugins → Choose Plugin File，选择 Release ZIP。
+3. 向 [Super Productivity 主仓库](https://github.com/super-productivity/super-productivity) 提交 PR，在 [`src/assets/community-plugins.json`](https://github.com/super-productivity/super-productivity/blob/master/src/assets/community-plugins.json) 中添加名称、简短英文描述、仓库 URL、作者及作者 URL；字段格式以提交时的文件为准。
+4. PR 中附上 Release 链接、截图和官方宿主兼容性验证结果，等待维护者审核。社区目录收录与随主应用内置是不同的贡献范围；内置集成需与维护者单独讨论。
+
+参考：[官方插件开发指南](https://github.com/super-productivity/super-productivity/blob/master/docs/plugin-development.md)。[Awesome 列表](https://github.com/super-productivity/awesome-super-productivity#plugins)的插件部分由上述 JSON 自动生成。
+
+## License
+
+本项目采用 [MIT License](LICENSE)，Copyright (c) 2026 dave。构建目录和发布 ZIP 均包含许可证。
+
+`package.json` 中的 `private: true` 仅防止误发布到 npm，不影响 MIT 授权或 GitHub 仓库公开。

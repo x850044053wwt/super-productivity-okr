@@ -20,6 +20,6 @@ fs.copyFileSync(
   path.join(out, "i18n/en.json"),
 );
 
-for (const file of ["plugin.js", "icon.svg"]) {
+for (const file of ["plugin.js", "icon.svg", "LICENSE"]) {
   fs.copyFileSync(path.join(__dirname, file), path.join(out, file));
 }
